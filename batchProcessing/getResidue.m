@@ -5,7 +5,7 @@ function residue = getResidue(im)
 % RESIDUE - A scalar structure with the processing results.
 %
 
-im = double(im);
+% im = double(im);
 im = rgb2gray(im);
 filtered = DenoiserMihcak(im,3,'db8');
-residue = im - filtered;
+residue = double(im) - filtered;
