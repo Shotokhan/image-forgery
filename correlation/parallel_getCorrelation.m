@@ -1,7 +1,26 @@
-function y = parallel_getCorrelation(prnu, img_under_test, window_size, weights)
+function y = parallel_getCorrelation(prnu, img_under_test, window_size, weights, denoiser)
+    % Returns the correlation map between the estimated PRNU and the
+    % residual of the input image
+    % prnu: the estimated PRNU
+    % img_under_test: RGB image to test, "as-it-is" when it is read
+    % window_size: size of the sliding correlation window
+    % weights: window of (window_size)x(window_size) dimension of weights
+    % to apply to the correlation, this is for guided correlation
+    % denoiser: specifies denoiser to apply to compute the residual, you
+    % must take care to use a PRNU estimated with the same denoiser to have
+    % meaningful results; "bm3d" to use BM3D denoiser, default or nothing
+    % is Mihcak denoiser.
+    % The function executes with a parallel pool of workers
     % TODO: check for good input
     [M, N] = size(prnu);
-    res = getResidue(img_under_test);
+    res = zeros(M, N);
+    if ~exist('denoiser', 'var')
+        res = getResidue(img_under_test);
+    elseif denoiser == "bm3d"
+        res = getResidue_BM3D(img_under_test);
+    else
+        res = getResidue(img_under_test);
+    end
 
     pad_size = 0;
 
