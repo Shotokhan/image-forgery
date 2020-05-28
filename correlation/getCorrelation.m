@@ -1,26 +1,41 @@
-function corr_matrix = getCorrelation(estPRNU,img,K,weights)
-    
-    img_res = getResidue(img);
-    [M,N] = size(img_res);
-    
-    pad_size = [(K-1)/2 (K-1)/2]
-    pad_res = padarray(img_res,pad_size,'symmetric');
-    pad_PRNU = padarray(estPRNU,pad_size,'symmetric');
-    
-    block_res = zeros(K,K);
-    block_PRNU = zeros(K,K);
-    corrp = zeros(M,N);
-    weights = ones(M,N); % TO BE REMOVED
-    
-    for i=1:M
-        for j=1:N
-            block_res = pad_res(i:K+i-1,j:K+j-1);
-            block_PRNU = pad_PRNU(i:K+i-1,j:K+j-1);
-            corrp(i,j) = corr2(block_res,block_PRNU).*weights(i,j);
-        end
+function y = getCorrelation(prnu, img_under_test, weights, denoiser)
+    % Returns the correlation map between the estimated PRNU and the
+    % residual of the input image
+    % prnu: the estimated PRNU
+    % img_under_test: RGB image to test, "as-it-is" when it is read
+    % window_size: size of the sliding correlation window
+    % weights: window of (window_size)x(window_size) dimension of weights
+    % to apply to the correlation, this is for guided correlation
+    % denoiser: specifies denoiser to apply to compute the residual, you
+    % must take care to use a PRNU estimated with the same denoiser to have
+    % meaningful results; "bm3d" to use BM3D denoiser, default or nothing
+    % is Mihcak denoiser.
+    % TODO: check for good input
+    [M, N] = size(prnu);
+    res = zeros(M, N);
+    if ~exist('denoiser', 'var')
+        res = getResidue(img_under_test);
+    elseif denoiser == "bm3d"
+        res = getResidue_BM3D(img_under_test);
+    else
+        res = getResidue(img_under_test);
     end
+
+    sum_w = sum(weights(:));
+    weights = weights / sum_w;
+
+    mean_x = imfilter(prnu, weights, 'symmetric');
+    mean_y = imfilter(res, weights, 'symmetric');
     
-    corr_matrix = corrp;
+    mean_xy = imfilter(prnu.*res, weights, 'symmetric');
+    corr_xy = mean_xy - mean_x.*mean_y;
     
+    mean_xx = imfilter(prnu.^2, weights, 'symmetric');
+    var_x = mean_xx - mean_x.^2;
+    mean_yy = imfilter(res.^2, weights, 'symmetric');
+    var_y = mean_yy - mean_y.^2;
+    
+    y = corr_xy ./ sqrt(var_x.*var_y);
 end
+
 
