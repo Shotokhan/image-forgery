@@ -1,6 +1,4 @@
-function corr_matrix = getGuidedCorrelation(estPRNU,img)
-    
-    K = 127;
+function corr_matrix = getGuidedCorrelation(estPRNU,img,K)
 
     img_res = getResidue(img);
     
