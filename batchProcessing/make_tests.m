@@ -20,16 +20,19 @@ for i=1:length(win_sizes)
 end
 
 for i=1:length(win_sizes)
-    measures(i,:) = th_opt_hillclimb(org, frg, corr_mats(:,:,:,i), 0);
+    [th, f] = th_opt_hillclimb(org, frg, corr_mats(:,:,:,i), 0);
+    measures(i,:) = [th, f];
 end
 
 [~, ind_max] = max(measures(:,2));
 best_win = win_sizes(ind_max);
 
 corr_mats(:,:,:,length(win_sizes)+1) = batch_test(prnu_bm3d, frg, "bm3d", "standard", best_win);
-measures(length(win_sizes)+1,:) = th_opt_hillclimb(org, frg, corr_mats(:,:,:,length(win_sizes)+1), 0);
-corr_mats(:,:,:,length(win_sizes)+2) = batch_test(prnu_bm3d, frg, "bm3d", "guided", best_win);
-measures(length(win_sizes)+2,:) = th_opt_hillclimb(org, frg, corr_mats(:,:,:,length(win_sizes)+2), 0);
+[th, f] = th_opt_hillclimb(org, frg, corr_mats(:,:,:,length(win_sizes)+1), 0);
+measures(length(win_sizes)+1,:) = [th, f];
+corr_mats(:,:,:,length(win_sizes)+2) = real(batch_test(prnu_bm3d, frg, "bm3d", "guided", best_win));
+[th, f] = th_opt_hillclimb(org, frg, corr_mats(:,:,:,length(win_sizes)+2), 0);
+measures(length(win_sizes)+2,:) = [th, f];
 
 save('corr_mats.mat', 'corr_mats');
 save('measures.mat', 'measures');
