@@ -1,4 +1,4 @@
-function corr_matrix = getGuidedCorrelation(estPRNU,img,K)
+function corr_matrix = getGuidedCorrelation(estPRNU,img,K,denoiser)
 
     [M, N, ~] = size(img);
     img_res = zeros(M, N);
