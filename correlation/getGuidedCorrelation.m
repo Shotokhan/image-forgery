@@ -1,6 +1,14 @@
 function corr_matrix = getGuidedCorrelation(estPRNU,img,K)
 
-    img_res = getResidue(img);
+    [M, N, ~] = size(img);
+    img_res = zeros(M, N);
+    if ~exist('denoiser', 'var')
+        img_res = getResidue(img);
+    elseif denoiser == "bm3d"
+        img_res = getResidue_BM3D(img);
+    else
+        img_res = getResidue(img);
+    end
     
     mean_x = imguidedfilter(estPRNU,img,'NeighborhoodSize',K);
     mean_y = imguidedfilter(img_res,img,'NeighborhoodSize',K);
