@@ -30,7 +30,7 @@ figure; imshow(superfake);
 complete_superfake = cat(3,hsv_fake(:,:,1),hsv_fake(:,:,2),superfake);
 complete_superfake = hsv2rgb(complete_superfake);
 
-corr_matrix = getWeightedCorrelation(estPRNU,complete_superfake,127,0);
+corr_matrix = getCorrelation(estPRNU,complete_superfake,127,0);
 
 figure; imshow(corr_matrix,[]); colormap('jet');
 figure; imshow(complete_superfake);
