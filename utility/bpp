@@ -1,0 +1,8 @@
+function y = bpp(filename)
+    fid = fopen(filename, 'r');
+    [~, bytes] = fread(fid, 'uint8');
+    x = imread(filename);
+    [M, N] = size(x);
+    y = (bytes*8)/(M*N);
+    fclose(fid);
+end
